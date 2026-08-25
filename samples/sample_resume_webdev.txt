@@ -1,0 +1,19 @@
+Aditya Verma
+aditya.v@example.com | +91 9123456780
+github.com/adityav | linkedin.com/in/adityav
+
+EDUCATION
+B.Tech Computer Science and Engineering, 3rd Year (2024 - 2028)
+CGPA: 8.2 / 10
+
+TECHNICAL SKILLS
+- Languages: JavaScript, TypeScript, HTML5, CSS3, SQL
+- Frontend: React.js, Next.js, Tailwind CSS, Redux
+- Backend: Node.js, Express.js, MongoDB
+- DevOps & Tools: Git, GitHub, Linux
+
+PROJECTS
+- Full-Stack E-Commerce Platform
+  Built with React, Node.js, Express, MongoDB with Stripe payment gateway integration.
+- Real-Time Chat Application
+  Built with Socket.io, React, Tailwind CSS, and Redis session store.
