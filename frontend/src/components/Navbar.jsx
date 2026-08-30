@@ -60,15 +60,15 @@ export default function Navbar({
             </button>
 
             <button
-              onClick={() => setActiveTab('roadmap')}
+              onClick={() => setActiveTab('projects')}
               className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center space-x-2 cursor-pointer ${
-                activeTab === 'roadmap'
+                activeTab === 'projects'
                   ? 'bg-emerald-600 text-white shadow-sm'
                   : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
               }`}
             >
               <BookOpen className="w-3.5 h-3.5" />
-              <span>12-Week Roadmap</span>
+              <span>Recommended Projects</span>
             </button>
 
             <button

@@ -4,6 +4,7 @@ import LandingPage from './components/LandingPage';
 import DashboardView from './components/DashboardView';
 import ResumeView from './components/ResumeView';
 import RoadmapView from './components/RoadmapView';
+import ProjectsView from './components/ProjectsView';
 import PresentationModal from './components/PresentationModal';
 import MentorComingSoon from './components/MentorComingSoon';
 
@@ -424,13 +425,13 @@ export default function App() {
             loading={loading}
             onAnalyze={runGapAnalysis}
             onGoToResume={() => setActiveTab('resume')}
-            onGoToRoadmap={() => setActiveTab('roadmap')}
+            onGoToProjects={() => setActiveTab('projects')}
             currentUser={currentUser}
             highlightUpload={highlightUpload}
           />
         )}
 
-        {/* Resume */}
+        {/* Resume & Roadmap */}
         {activeTab === 'resume' && (
           <ResumeView
             profile={profile}
@@ -441,14 +442,19 @@ export default function App() {
             loading={loading}
             onLoadPreset={handleLoadPreset}
             highlightUpload={highlightUpload}
+            roadmap={roadmap}
+            recommendations={recommendations}
           />
         )}
 
-        {/* Roadmap */}
-        {activeTab === 'roadmap' && (
-          <RoadmapView
-            roadmap={roadmap}
-            recommendations={recommendations}
+        {/* Recommended Projects */}
+        {(activeTab === 'projects' || activeTab === 'roadmap') && (
+          <ProjectsView
+            roles={roles}
+            selectedRole={selectedRole}
+            onSelectRole={setSelectedRole}
+            userSkills={userSkills}
+            gapAnalysis={gapAnalysis}
             onGoToResume={() => setActiveTab('resume')}
           />
         )}

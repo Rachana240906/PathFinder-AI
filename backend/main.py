@@ -12,7 +12,7 @@ from services.roadmap_generator import roadmap_generator
 from services.opportunities import CURATED_MENTORS, CURATED_OPPORTUNITIES
 from services.database import (
     save_profile, get_profile, create_user, authenticate_user, 
-    get_user_by_email, update_user_profile
+    get_user_by_email, update_user_profile, get_projects_for_gaps
 )
 
 app = FastAPI(
@@ -251,6 +251,35 @@ def analyze_skill_gap(req: SkillGapRequest):
         "explainable_recommendations": recommendations,
         "personalized_roadmap": roadmap,
         "suitability": suitability
+    }
+
+@app.get("/api/recommendations/projects")
+def get_recommended_projects(role: str = "ai_ml_engineer", skills: str = ""):
+    """
+    Return projects that cover the user's skill gaps for the given role.
+    skills = comma-separated list of the user's current skills (passed from frontend).
+    """
+    user_skills = [s.strip() for s in skills.split(",") if s.strip()] if skills else []
+    if not user_skills:
+        return {"projects": [], "role": role}
+
+    # Reuse existing gap_analyzer to get gap list for this role
+    gap_result = gap_analyzer.analyze(user_skills, role)
+    gap_skills = (
+        [s["name"] for s in gap_result.get("missing_core_skills", [])]
+        + [s["name"] for s in gap_result.get("missing_advanced_skills", [])]
+        + [s["name"] for s in gap_result.get("missing_tools", [])]
+    )
+
+    if not gap_skills:
+        return {"projects": [], "role": role, "message": "No gaps found — all primary skills matched!"}
+
+    projects = get_projects_for_gaps(gap_skills, role, top_n=6)
+    return {
+        "projects": projects,
+        "role": role,
+        "total_gaps": len(gap_skills),
+        "gap_skills": gap_skills,
     }
 
 @app.get("/api/opportunities")

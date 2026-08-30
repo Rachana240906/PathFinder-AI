@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Cpu, Code2, BarChart3, Cloud, ShieldCheck, Monitor,
   Server, Smartphone, Link, MessageSquare, Database, Layers,
   Gamepad2, Briefcase, CheckCircle, TrendingUp, ChevronRight,
-  UploadCloud, Sparkles, AlertCircle, Search, Filter
+  UploadCloud, Sparkles, AlertCircle, Search, Filter, PlayCircle
 } from 'lucide-react';
+import RecommendedProjects from './RecommendedProjects';
 
 const iconMap = {
   Cpu, Code2, BarChart3, Cloud, ShieldCheck, Monitor,
@@ -22,12 +23,18 @@ export default function DashboardView({
   loading,
   onAnalyze,
   onGoToResume,
-  onGoToRoadmap,
+  onGoToProjects,
   currentUser,
   highlightUpload = false,
 }) {
   const [domainFilter, setDomainFilter] = useState('all'); // 'all', 'technical', 'non_technical'
   const [searchQuery, setSearchQuery] = useState('');
+  const [gapAnalyzed, setGapAnalyzed] = useState(false);
+
+  // Reset gated state whenever the selected role changes
+  useEffect(() => {
+    setGapAnalyzed(false);
+  }, [selectedRole]);
 
   const hasSkills = userSkills && userSkills.length > 0;
   
@@ -133,13 +140,13 @@ export default function DashboardView({
 
             {hasSkills && gapAnalysis && (
               <button
-                onClick={onGoToRoadmap}
+                onClick={onGoToResume}
                 className="text-xs px-4 py-2 rounded-xl font-semibold flex items-center gap-1.5 transition-all cursor-pointer"
                 style={{ background: 'var(--bg-card)', color: 'var(--text-secondary)', border: '1px solid var(--border)' }}
                 onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--accent)'; e.currentTarget.style.color = 'var(--accent)'; }}
                 onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.color = 'var(--text-secondary)'; }}
               >
-                View Roadmap <ChevronRight size={13} />
+                View Resume & Roadmap <ChevronRight size={13} />
               </button>
             )}
 
@@ -329,6 +336,7 @@ export default function DashboardView({
                 if (!hasSkills) {
                   onGoToResume();
                 } else if (onAnalyze) {
+                  setGapAnalyzed(true);
                   onAnalyze(userSkills, selectedRole);
                 }
               }}
@@ -352,6 +360,33 @@ export default function DashboardView({
 
         {/* Skill Gap Breakdown Panel */}
         <div className="space-y-5">
+
+          {/* ── Not yet analyzed placeholder ── */}
+          {!gapAnalyzed && (
+            <div
+              className="rounded-2xl p-8 text-center shadow-sm"
+              style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)' }}
+            >
+              <div
+                className="w-12 h-12 rounded-2xl flex items-center justify-center mx-auto mb-3"
+                style={{ background: 'var(--accent-dim)', border: '1px solid var(--accent-border)' }}
+              >
+                <PlayCircle size={24} style={{ color: 'var(--accent)' }} />
+              </div>
+              <p className="text-sm font-bold" style={{ color: 'var(--text-primary)' }}>
+                {hasSkills ? 'Ready to Analyze' : 'Upload Resume First'}
+              </p>
+              <p className="text-xs mt-1 max-w-xs mx-auto" style={{ color: 'var(--text-muted)' }}>
+                {hasSkills
+                  ? 'Click "Analyze Gap" below to see your Skill Gap Breakdown, Acquired Skills, and Gaps to Bridge.'
+                  : 'Upload your resume on the Resume page, then select a role and click Analyze Gap.'}
+              </p>
+            </div>
+          )}
+
+          {/* ── Cards shown only after Analyze is clicked ── */}
+          {gapAnalyzed && (
+            <>
 
           {/* Category bars */}
           <div
@@ -520,6 +555,31 @@ export default function DashboardView({
               </div>
             )}
           </div>
+
+          {/* ── CTA Card to Recommended Projects Page ── */}
+          <div
+            className="rounded-2xl p-5 shadow-sm flex items-center justify-between gap-4"
+            style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)' }}
+          >
+            <div>
+              <h3 className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
+                <Sparkles size={14} className="text-emerald-600" />
+                <span>Recommended Projects Page</span>
+              </h3>
+              <p className="text-[11px] text-slate-500 mt-0.5">
+                Explore dedicated hands-on project recommendations to bridge your missing skills.
+              </p>
+            </div>
+            <button
+              onClick={onGoToProjects}
+              className="px-3.5 py-2 rounded-xl text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 transition-all flex items-center gap-1 shrink-0 cursor-pointer"
+            >
+              <span>Explore Projects</span>
+              <ChevronRight size={13} />
+            </button>
+          </div>
+            </>
+          )}
         </div>
       </div>
     </div>
