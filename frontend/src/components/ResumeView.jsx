@@ -3,6 +3,7 @@ import {
   Upload, FileText, X, Plus, Check, ChevronRight,
   BookOpen, Cpu, Sparkles, History, Trash2, RotateCcw, Clock, CheckCircle2
 } from 'lucide-react';
+import RoadmapView from './RoadmapView';
 
 const PRESETS = [
   { key: 'rachana',   label: 'Rachana — AI/ML',          role: 'AI / ML Engineer',      domain: 'Technical' },
@@ -37,6 +38,8 @@ export default function ResumeView({
   loading,
   onLoadPreset,
   highlightUpload = false,
+  roadmap,
+  recommendations = [],
 }) {
   const [dragActive, setDragActive] = useState(false);
   const [newSkill, setNewSkill] = useState('');
@@ -44,6 +47,8 @@ export default function ResumeView({
   const [rawText, setRawText] = useState('');
   const [resumeHistory, setResumeHistory] = useState(loadHistory);
   const [showHistory, setShowHistory] = useState(false);
+  const [uploadedFileUrl, setUploadedFileUrl] = useState(null);
+  const [showPdfViewer, setShowPdfViewer] = useState(false);
   const fileInputRef = useRef(null);
 
   // Persist history to localStorage whenever it changes
@@ -84,6 +89,11 @@ export default function ResumeView({
   };
 
   const handleFileUpload = async (file) => {
+    // Create a fresh object URL for viewing; revoke any previous one
+    if (uploadedFileUrl) URL.revokeObjectURL(uploadedFileUrl);
+    const fileUrl = URL.createObjectURL(file);
+    setUploadedFileUrl(fileUrl);
+    setShowPdfViewer(false);
     const fd = new FormData(); fd.append('file', file);
     try {
       const res = await fetch('/api/resume/upload', { method: 'POST', body: fd });
@@ -288,14 +298,32 @@ export default function ResumeView({
               <h2 className="text-sm font-bold" style={{ color: 'var(--text-primary)' }}>Parsed Profile</h2>
               <p className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>Extracted candidate details</p>
             </div>
-            <div
-              className="text-center px-3 py-1.5 rounded-xl"
-              style={{ background: 'var(--accent-dim)', border: '1px solid var(--accent-border)' }}
-            >
-              <p className="text-lg font-extrabold leading-none" style={{ color: 'var(--accent)' }}>
-                {userSkills.length > 0 ? profileScore : 0}%
-              </p>
-              <p className="text-[9px] font-bold mt-0.5" style={{ color: 'var(--accent)' }}>Strength</p>
+            <div className="flex items-center gap-2">
+              {uploadedFileUrl && (
+                <button
+                  onClick={() => setShowPdfViewer(v => !v)}
+                  className="text-xs px-3 py-1.5 rounded-lg font-bold flex items-center gap-1.5 transition-all cursor-pointer"
+                  style={{
+                    background: showPdfViewer ? 'var(--accent)' : 'var(--accent-dim)',
+                    color: showPdfViewer ? '#ffffff' : 'var(--accent)',
+                    border: '1px solid var(--accent-border)',
+                  }}
+                  onMouseEnter={e => { if (!showPdfViewer) e.currentTarget.style.background = 'rgba(5,150,105,0.15)'; }}
+                  onMouseLeave={e => { if (!showPdfViewer) e.currentTarget.style.background = 'var(--accent-dim)'; }}
+                >
+                  <FileText size={13} />
+                  {showPdfViewer ? 'Hide Resume' : 'View Resume'}
+                </button>
+              )}
+              <div
+                className="text-center px-3 py-1.5 rounded-xl"
+                style={{ background: 'var(--accent-dim)', border: '1px solid var(--accent-border)' }}
+              >
+                <p className="text-lg font-extrabold leading-none" style={{ color: 'var(--accent)' }}>
+                  {userSkills.length > 0 ? profileScore : 0}%
+                </p>
+                <p className="text-[9px] font-bold mt-0.5" style={{ color: 'var(--accent)' }}>Strength</p>
+              </div>
             </div>
           </div>
 
@@ -351,6 +379,32 @@ export default function ResumeView({
                 <p className="text-[11px] mt-0.5 max-w-xs" style={{ color: 'var(--text-muted)' }}>
                   Upload a PDF resume on the left or click a demo profile to preview parsed results.
                 </p>
+              </div>
+            )}
+
+            {/* Embedded PDF Viewer Panel */}
+            {showPdfViewer && uploadedFileUrl && (
+              <div className="mt-4 pt-4 border-t border-slate-200 animate-fade-in">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
+                    <FileText size={14} className="text-emerald-600" /> Embedded PDF Preview
+                  </span>
+                  <a
+                    href={uploadedFileUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-[11px] text-emerald-600 hover:underline font-semibold"
+                  >
+                    Open in new tab ↗
+                  </a>
+                </div>
+                <div className="rounded-xl overflow-hidden border border-slate-200 bg-slate-100 h-96">
+                  <iframe
+                    src={uploadedFileUrl}
+                    title="Resume PDF Preview"
+                    className="w-full h-full border-none"
+                  />
+                </div>
               </div>
             )}
           </div>
@@ -583,6 +637,15 @@ export default function ResumeView({
             </button>
           </form>
         </div>
+      </div>
+
+      {/* ── Embedded 12-Week Roadmap ── */}
+      <div className="pt-4 border-t border-slate-200">
+        <h2 className="text-base font-extrabold text-slate-900 mb-4 flex items-center gap-2">
+          <BookOpen className="w-5 h-5 text-emerald-600" />
+          <span>Your 12-Week Milestone Roadmap</span>
+        </h2>
+        <RoadmapView roadmap={roadmap} recommendations={recommendations} />
       </div>
     </div>
   );

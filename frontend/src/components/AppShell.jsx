@@ -1,14 +1,14 @@
 import React from 'react';
 import {
-  LayoutDashboard, FileText, Map, Users, Compass, LogOut,
+  LayoutDashboard, FileText, FolderGit2, Users, Compass, LogOut,
   ChevronRight, BookOpenCheck, Sparkles
 } from 'lucide-react';
 
 const NAV_ITEMS = [
-  { id: 'dashboard', label: 'Dashboard',  icon: LayoutDashboard },
-  { id: 'resume',    label: 'Resume',      icon: FileText },
-  { id: 'roadmap',   label: 'Roadmap',     icon: Map },
-  { id: 'mentors',   label: 'Mentors',     icon: Users },
+  { id: 'dashboard', label: 'Dashboard',            icon: LayoutDashboard },
+  { id: 'resume',    label: 'Resume & Roadmap',     icon: FileText },
+  { id: 'projects',  label: 'Recommended Projects', icon: FolderGit2 },
+  { id: 'mentors',   label: 'Mentors',              icon: Users },
 ];
 
 export default function AppShell({ activeTab, setActiveTab, currentUser, onLogout, onOpenPitch, highlightUpload = false, children }) {
